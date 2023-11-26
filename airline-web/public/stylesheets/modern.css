@@ -67,7 +67,7 @@ div.section {
 /*
 .airportCanvasLeftGroup > :first-child .section {
 	backdrop-filter: none !important;
-	background: var(--placeholderBlurColorLight)/* << This color should be taken from one of the sections that have backdrop-filter */
+	background: var(--placeholderBlurColorLight)/* << This color should be taken from one of the sections that have backdrop-filter *//*
 }
 */
 html[data-theme="dark"] .airportCanvasLeftGroup > :first-child .section {
