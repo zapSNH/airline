@@ -167,13 +167,9 @@ div#topBar {
 }
 /**/
 /* back button for when you place the google maps man */
-div[jstcache="0"] > div:is([style="z-index: 24601; position: absolute; left: 0px; top: 0px;"]) {
-	top: 50px !important;
-	left: 50px !important
-}
-div[jstcache="0"] > :has(> .gm-iv-address) {
-	top: 50px !important;
-	left: 78px !important;
+div[jstcache="0"] > div:is([style="z-index: 24601; position: absolute; left: 0px; top: 0px;"], [style="position: absolute; left: 28px; top: 0px;"]) {
+    top: 50px !important;
+    left: 50px !important
 }
 #mainContainer {
 	padding-top: 40px;
@@ -274,29 +270,25 @@ html[data-theme="dark"] :is(.gm-fullscreen-control img, .gmnoprint div button im
 	position: fixed !important
 }
 #hideRivalMapButton {
-	top: 48px !important
-}
-#linksCanvas .mainPanel {
-    width: 55%;
+    top: 48px !important
 }
 #sidePanel {
-	position: absolute;
-	padding-left: 10px;
-	padding-right: 32px;
-	box-sizing: border-box;
-	width: 45%;
-	pointer-events: none;
-	border-radius: 8px !important;
-	right: 0;
+    position: absolute;
+    right: 32px;
+    width: 40%;
+    pointer-events: none;
+    border-radius: 8px !important;
 }
 #sidePanel > * {
 	pointer-events: auto;
 }
 #map .gmnoprint[role="menubar"] {
-	position: fixed !important;
-	top: 40px !important;
-	left: 40px !important;
-	width: 100px
+    position: fixed !important;
+    top: 40px !important;
+    left: 40px !important;
+    width: 100px;
+    height: 80px !important;
+    display: block;
 }
 #map .gmnoprint[role="menubar"] > :first-child {
 	border-radius: 8px 8px 0 0 !important;
@@ -352,6 +344,7 @@ html[data-theme="dark"] :is(.gm-fullscreen-control img, .gmnoprint div button im
     position: fixed !important;
     border-radius: 8px;
     box-shadow: var(--shadow-2) !important;
+    left: 40px !important
 }
 #map #toggleMapHeatmapButton {
 	top: 183px
@@ -372,6 +365,9 @@ html[data-theme="dark"] :is(.gm-fullscreen-control img, .gmnoprint div button im
 	box-shadow: var(--shadow-2) !important;
 	border-radius: 8px !important
 }
+div[style="position: relative; overflow: hidden; width: 30px; height: 1px; margin: 0px 5px; background-color: rgb(230, 230, 230); top: 0px;"] {
+    opacity: 0
+}
 /* Mobile */
 .extendedTopBarDetails {
     position: absolute;
@@ -387,9 +383,6 @@ html[data-theme="dark"] :is(.gm-fullscreen-control img, .gmnoprint div button im
 #moreTopBarTab li {
     border: none !important;
     box-shadow: var(--shadow-1) !important;
-}
-#map {
-	height: 100% !important;
 }
 @media screen and (max-width: 640px) {
     #topBar {
