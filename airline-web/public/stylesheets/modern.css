@@ -358,6 +358,9 @@ html[data-theme="dark"] :is(.gm-fullscreen-control img, .gmnoprint div button im
 #map #toggleMapLightButton {
 	top: 321px
 }
+#map #toggleMapChristmasButton {
+    top: 367px
+}
 #map .gm-svpc {
 	position: fixed !important;
 	top: 136px !important;
