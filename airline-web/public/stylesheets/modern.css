@@ -346,6 +346,7 @@ html[data-theme="dark"] :is(.gm-fullscreen-control img, .gmnoprint div button im
     box-shadow: var(--shadow-2) !important;
     left: 40px !important
 }
+
 #map #toggleMapHeatmapButton {
 	top: 183px
 }
