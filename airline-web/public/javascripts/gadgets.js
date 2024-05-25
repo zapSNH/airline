@@ -1,4 +1,4 @@
-var noFlags = ["BL", "CW", "IM", "GG", "JE", "BQ", "MF", "SS", "SX", "XK"]
+var noFlags = ["BL", "GG", "JE", "BQ", "MF", "SS"]
 
 function htmlEncode(str){
   return String(str).replace(/[^\w. ]/gi, function(c){
@@ -226,7 +226,7 @@ function getCountryFlagUrl(countryCode) {
 }
 
 function getAirlineLogoImg(airlineId) {
-	return "<img class='logo' src='" + "/airlines/" + airlineId + "/logo' style='vertical-align:middle;'/>"
+	return "<img class='logo' loading='lazy' width='24px' height='12px' src='" + "/airlines/" + airlineId + "/logo' style='vertical-align:middle;'/>"
 }
 
 
@@ -244,6 +244,13 @@ function getAirlineSpan(airlineId, airlineName) {
 	$airlineSpan.append(getAirlineLabelSpan(airlineId, airlineName))
 
 	return $airlineSpan[0].outerHTML
+}
+
+function getAirlineLogoSpan(airlineId, airlineName) {
+    var $airlineLogoSpan = $('<span></span>')
+	$airlineLogoSpan.append(getAirlineLogoImg(airlineId))
+	$airlineLogoSpan.attr("title", airlineName)
+    return $airlineLogoSpan
 }
 
 function getUserLevelImg(level) {
@@ -338,12 +345,15 @@ function getRankingImg(ranking) {
 	} else if (ranking <= 10) {
 		rankingIcon = "assets/images/icons/trophy-" + ranking + ".png"
 		rankingTitle = ranking + "th place"
+	} else if (ranking <= 20) {
+		rankingIcon = "assets/images/icons/counter-" + ranking + ".png"
+        rankingTitle = ranking + "th place"
 	}
 	
 	if (rankingIcon) {
 		return "<img src='" + rankingIcon + "' title='" + rankingTitle + "' style='vertical-align:middle;'/>"
 	} else {
-		return ""
+		return "<span>" + ranking + "</span>"
 	}
 }
 

@@ -25,7 +25,7 @@ GET	 	 /airports/:airportId/link-statistics	        controllers.Application.getA
 GET	 	 /airports/:airportId/loyalist-data	        controllers.Application.getAirportLoyalistData(airportId : Int, airlineId: Option[Int])
 GET	 	 /airports/:airportId/departures/:dayOfWeek/:hour/:minute controllers.Application.getDepartures(airportId : Int, dayOfWeek : Int, hour : Int, minute : Int)
 GET		 /airports/:fromAirportId/to/:toAirportId				controllers.Application.getAirportLinkConsumptions(fromAirportId : Int, toAirportId : Int)
-GET		 /airports/:airportId/link-consumptions	controllers.Application.getLinkConsumptionsByAirport(airportId : Int)
+GET		 /airports/:airportId/links	controllers.Application.getLinksByAirport(airportId : Int)
 #GET	 	 /airports/:airportId/projects	      controllers.Application.getAirportProjects(airportId : Int)
 #PUT	 	 /airports/:airportId/projects	      controllers.Application.addAirportProject(airlineId : Int, airportId : Int)
 GET	 	 /airports/:airportId/assets	      controllers.AirportAssetApplication.getAirportAssets(airportId : Int)
@@ -187,7 +187,7 @@ GET      /delegates/airline/:airlineId      controllers.DelegateApplication.getD
 GET      /delegates/airline/:airlineId/country/:countryCode      controllers.DelegateApplication.getCountryDelegates(countryCode : String, airlineId: Int)
 POST      /delegates/airline/:airlineId/country/:countryCode      controllers.DelegateApplication.updateCountryDelegates(countryCode : String, airlineId: Int)
 
-GET		 /santa-claus/guess/:airportId/:airlineId   controllers.ChristmasApplication.makeGuess(airportId : Int, airlineId : Int)
+GET		 /santa-claus/guess/:airportId/:airlineId/:difficulty   controllers.ChristmasApplication.makeGuess(airportId : Int, airlineId : Int, difficulty : String)
 GET		 /santa-claus/attempt-status/:airportId/:airlineId  controllers.ChristmasApplication.getAttemptStatus(airportId : Int, airlineId : Int)
 GET		 /santa-claus/award-options/:airlineId  controllers.ChristmasApplication.getAwardOptions(airlineId : Int)
 GET      /santa-claus/pick-award/:airlineId/:optionId   controllers.ChristmasApplication.pickAwardOption(airlineId : Int, optionId : Int)

@@ -409,9 +409,14 @@ function highlightPath(path, refocus) {
 
 	
 	if (!path.highlighted) { //only highlight again if it's not already done so
-	    path.setOptions({ strokeOpacity : pathOpacityByStyle[currentStyles].highlight })
-		var originalColorString = path.strokeColor
+	    var originalColorString = path.strokeColor
+		//keep track of original values so we can revert...shouldn't there be a better way to just get all options all at once?
 		path.originalColor = originalColorString
+		path.originalStrokeWeight = path.strokeWeight
+		path.originalZIndex = path.zIndex
+		path.originalStrokeOpacity = path.strokeOpacity
+
+		path.setOptions({ strokeOpacity : pathOpacityByStyle[currentStyles].highlight })
 		var totalFrames = 20
 		
 		var rgbHexValue = parseInt(originalColorString.substring(1), 16);
@@ -454,7 +459,7 @@ function highlightPath(path, refocus) {
 function unhighlightPath(path) {
 	window.clearInterval(path.animation)
 	path["animation"] = undefined
-	path.setOptions({ strokeColor : path.originalColor , strokeWeight : 2, zIndex : 90, strokeOpacity : pathOpacityByStyle[currentStyles].normal})
+	path.setOptions({ strokeColor : path.originalColor , strokeWeight : path.originalStrokeWeight, zIndex : path.originalZIndex, strokeOpacity : path.originalStrokeOpacity})
 	
 	delete path.highlighted
 }
@@ -672,14 +677,11 @@ function refreshLinkDetails(linkId) {
 	    	    success: function(linkConsumptions) {
 	    	    	$("#linkCompetitons .data-row").remove()
 	    	    	$.each(linkConsumptions, function(index, linkConsumption) {
-    	    			var row = $("<div class='table-row data-row clickable' data-link='rival'><div style='display: table-cell;'>" + linkConsumption.airlineName
+    	    			var row = $("<div class='table-row data-row clickable' onclick='showRivalsCanvas(" + linkConsumption.airlineId + ")' data-link='rival'><div style='display: table-cell;'>" + linkConsumption.airlineName
                                   		    	    				+ "</div><div style='display: table-cell;'>" + toLinkClassValueString(linkConsumption.price, "$")
                                   		    	    				+ "</div><div style='display: table-cell; text-align: right;'>" + toLinkClassValueString(linkConsumption.capacity)
                                   		    	    				+ "</div><div style='display: table-cell; text-align: right;'>" + linkConsumption.quality
                                   		    	    				+ "</div><div style='display: table-cell; text-align: right;'>" + linkConsumption.frequency + "</div></div>")
-                        row.click(function() {
-                            showRivalsCanvas(linkConsumption.airlineId)
-                        })
                         if (linkConsumption.airlineId == airlineId) {
                             $("#linkCompetitons .table-header").after(row) //self is always on top
                         } else {
@@ -983,18 +985,48 @@ function updatePlanLinkInfo(linkInfo, isRefresh) {
 	//$('#planLinkAirportLinkCapacity').text(linkInfo.airportLinkCapacity)
 	
 	
-	$("#planLinkCompetitons .data-row").remove()
+	$("#planLinkCompetitors .data-row").remove()
+
+	linkInfo.otherLinks.sort(function(a, b) {
+        return b.capacity.total - a.capacity.total;
+    });
 	$.each(linkInfo.otherLinks, function(index, linkConsumption) {
 		if (linkConsumption.airlineId != activeAirline.id) {
-			$("#planLinkCompetitons").append("<div class='table-row data-row'><div style='display: table-cell;'>" + getAirlineSpan(linkConsumption.airlineId, linkConsumption.airlineName)
+		    let loadFactorPercentage = Math.round(linkConsumption.soldSeats * 100 / linkConsumption.capacity.total)
+			$("#planLinkCompetitors").append("<div class='table-row data-row'><div style='display: table-cell;'>" + getAirlineSpan(linkConsumption.airlineId, linkConsumption.airlineName)
 				    	    			   + "</div><div style='display: table-cell;'>" + toLinkClassValueString(linkConsumption.price, "$")
-				    	    			   + "</div><div style='display: table-cell; text-align:right;'>" + toLinkClassValueString(linkConsumption.capacity)
+				    	    			   + "</div><div style='display: table-cell; text-align:right;'>" + toLinkClassValueString(linkConsumption.capacity) + " (" + linkConsumption.frequency + ")"
 				    	    			   + "</div><div style='display: table-cell; text-align:right;'>" + linkConsumption.quality
-				    	    			   + "</div><div style='display: table-cell; text-align:right;'>" + linkConsumption.frequency + "</div></div>")
+				    	    			   + "</div><div style='display: table-cell; text-align:right;'>" + loadFactorPercentage + "%</div></div>")
 		}			
 	})
-	if ($("#planLinkCompetitons .data-row").length == 0) {
-		$("#planLinkCompetitons").append("<div class='table-row data-row'><div style='display: table-cell;'>-</div><div style='display: table-cell;'>-</div><div style='display: table-cell;'>-</div><div style='display: table-cell;'>-</div><div style='display: table-cell;'>-</div></div>")
+	if ($("#planLinkCompetitors .data-row").length < 5) { //then additional info
+	    linkInfo.otherViaLocalTransitLinks.sort(function(a, b) {
+            return b.capacity.total - a.capacity.total;
+        });
+	    $.each(linkInfo.otherViaLocalTransitLinks, function(index, linkConsumption) { //reachable by 1 local transit
+                if (linkConsumption.airlineId != activeAirline.id) {
+                    let loadFactorPercentage = Math.round(linkConsumption.soldSeats * 100 / linkConsumption.capacity.total)
+                    var $row = $("<div class='table-row data-row' style='opacity: 60%'><div style='display: table-cell;'>" + getAirlineSpan(linkConsumption.airlineId, linkConsumption.airlineName)
+                                                                          + "</div><div style='display: table-cell;'>" + toLinkClassValueString(linkConsumption.price, "$")
+                                                                          + "</div><div style='display: table-cell; text-align:right;'>" + toLinkClassValueString(linkConsumption.capacity) + " (" + linkConsumption.frequency + ")"
+                                                                          + "</div><div style='display: table-cell; text-align:right;'>" + linkConsumption.quality
+                                                                          + "</div><div style='display: table-cell; text-align:right;'>" + loadFactorPercentage + "%</div></div>")
+                    let phrases = []
+                    if (linkConsumption.altFrom) {
+                        phrases.push("Depart from " + linkConsumption.altFrom)
+                    }
+                    if (linkConsumption.altTo) {
+                        phrases.push("Arrive at " + linkConsumption.altTo)
+                    }
+                    $row.attr('title', phrases.join('; '))
+                    $("#planLinkCompetitors").append($row)
+                }
+            })
+	}
+
+	if ($("#planLinkCompetitors .data-row").length == 0) {
+		$("#planLinkCompetitors").append("<div class='table-row data-row'><div style='display: table-cell;'>-</div><div style='display: table-cell;'>-</div><div style='display: table-cell;'>-</div><div style='display: table-cell;'>-</div><div style='display: table-cell;'>-</div></div>")
 	}
 	
 	if (tempPath) { //remove previous plan link if it exists
@@ -3064,7 +3096,7 @@ function negotiationAnimation(savedLink, callback, callbackParam) {
 
 function addAirlineTooltip($target, airlineId, slogan, airlineName) {
     var $airlineTooltip = $('<div style="min-width: 150px;"></div>')
-    var $liveryImg = $('<img style="max-height: 100px; max-width: 250px; display: block; margin: auto;">').appendTo($airlineTooltip)
+    var $liveryImg = $('<img style="max-height: 100px; max-width: 250px; display: none; margin: auto;" loading="lazy">').appendTo($airlineTooltip)
     $liveryImg.attr('src', 'airlines/' + airlineId + "/livery")
     var $sloganDiv =$("<h5></h5>").appendTo($airlineTooltip)
     if (slogan) {
@@ -3073,5 +3105,8 @@ function addAirlineTooltip($target, airlineId, slogan, airlineName) {
         $sloganDiv.text(airlineName)
     }
     addTooltipHtml($target, $airlineTooltip, {'top' : '100%'})
+    $target.on('mouseenter', function() {
+        $liveryImg.show()
+    })
 }
 

@@ -8,6 +8,7 @@ function showRivalsCanvas(selectedAirline) {
 	highlightTab($('.rivalsCanvasTab'))
 	$('#rivalDetails').hide()
 	loadAllRivals(selectedAirline)
+	populateNavigation($("#rivalsCanvas"))
 }
 
 function toggleHideInactive(flagValue) {
@@ -60,7 +61,7 @@ function updateRivalsTable(sortProperty, sortOrder, selectedAirline) {
 	var displayRivals
 	if (hideInactive) {
 	    displayRivals = loadedRivals.filter(function(rival) {
-                                    	    		  return rival.loginStatus < 3
+                                    	    		  return rival.loginStatus < 3 || rival.id == selectedAirline
                                     	    	});
 	} else {
 	    displayRivals = loadedRivals
@@ -320,7 +321,8 @@ function updateRivalChampionedAirportsDetails(airlineId) {
 		url: "airlines/" + airlineId + "/championed-airports",
 	    contentType: 'application/json; charset=utf-8',
 	    dataType: 'json',
-	    success: function(championedAirports) {
+	    success: function(championedInfo) {
+	        var championedAirports = championedInfo.airports
 	    	$(championedAirports).each(function(index, championDetails) {
                 var row = $("<div class='table-row clickable' data-link='airport' onclick=\"showAirportDetails('" + championDetails.airportId + "');\"></div>")
                 row.append("<div class='cell'>" + getRankingImg(championDetails.ranking) + "</div>")
@@ -478,4 +480,9 @@ function hideRivalMap() {
 	updateAirportBaseMarkers([]) //revert base markers
 	rivalMapAirlineId = undefined
 	setActiveDiv($("#rivalsCanvas"))
+}
+
+function showRivalHistory() {
+    var airlineId = $('#rivalDetails').data("airlineId")
+    showSearchCanvas(loadedRivalsById[airlineId])
 }

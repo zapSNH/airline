@@ -1,7 +1,7 @@
 var loadedOlympicsEvents = []
 var loadedAlerts = []
 
-function showSearchCanvas() {
+function showSearchCanvas(historyAirline) {
     var titlesContainer = $("#searchCanvas div.titlesContainer")
     positionTitles(titlesContainer)
     setActiveDiv($("#searchCanvas"))
@@ -26,6 +26,14 @@ function showSearchCanvas() {
     updateNavigationArrows(titlesContainer)
 
     initializeHistorySearch()
+
+    if (historyAirline) {
+        var historyDiv = titlesContainer.find('.titleSelection[data-search-type="history"]')
+        $(historyDiv).trigger('click')
+        $('#searchCanvas div.historySearch input.airline').data('selectedId',historyAirline.id)
+        $('#searchCanvas div.historySearch input.airline').val(getAirlineTextEntry(historyAirline, false))
+        searchLinkHistory()
+    }
 }
 
 function showBanner() {
@@ -76,8 +84,6 @@ function initializeHistorySearch() {
         updateLinkHistoryTable(sortProperty, sortOrder)
        })
      });
-
-
 }
 
 function refreshSearchDiv(selectedDiv) {
@@ -189,13 +195,7 @@ function searchRoute(fromAirportId, toAirportId) {
                             }
 
                             if (remarks.length > 0) {
-                                var remarksText = ""
-                                for (i = 0 ; i < remarks.length; i++) {
-                                    if (i > 0) {
-                                        linkDurationText += ", "
-                                    }
-                                    remarksText += remarks[i]
-                                }
+                                var remarksText = remarks.join(", ")
                                 linkDurationText += "(" + remarksText + ")"
                             }
 
@@ -800,9 +800,12 @@ function researchFlight(fromAirportId, toAirportId) {
                 loadAirportImage(fromAirportId, $('#researchSearchResult img.fromAirport') )
                 loadAirportImage(toAirportId, $('#researchSearchResult img.toAirport'))
                 $("#researchSearchResult .fromAirportText").text(result.fromAirportText)
+		        $("#researchSearchResult .fromAirportText")[0].setAttribute("onclick", `showAirportDetails(${fromAirportId})`)
                 $("#researchSearchResult .fromAirport .population").text(commaSeparateNumber(result.fromAirport.population))
                 $("#researchSearchResult .fromAirport .incomeLevel").text(result.fromAirport.incomeLevel)
                 $("#researchSearchResult .toAirportText").text(result.toAirportText)
+		        $("#researchSearchResult .toAirportText")[0].setAttribute("onclick", `showAirportDetails(${toAirportId})`)
+		        populateNavigation($("#researchSearchResult"))
                 $("#researchSearchResult .toAirport .population").text(commaSeparateNumber(result.toAirport.population))
                 $("#researchSearchResult .toAirport .incomeLevel").text(result.toAirport.incomeLevel)
 
@@ -883,7 +886,8 @@ function getZoneTextEntry(zone) {
 }
 
 function getAirlineTextEntry(airline, showPreviousNames) {
-    var result = airline.airlineName + "(" + airline.airlineCode + ")"
+    var name = airline.airlineName ? airline.airlineName : airline.name //some inconsistencies...
+    var result = name + "(" + airline.airlineCode + ")"
     if (showPreviousNames && airline.previousNames && airline.previousNames.length > 0) {
         result += (" formerly: " + airline.previousNames.join(", "))
     }

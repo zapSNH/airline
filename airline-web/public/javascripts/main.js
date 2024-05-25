@@ -273,11 +273,13 @@ function logout() {
 function showUserSpecificElements() {
 	$('.user-specific-tab').show()
 	$('.topBarDetails').show()
+	$('.topBarDetails').parent().removeClass('hide-empty') //hack to avoid empty floating div for modern layout
 }
 
 function hideUserSpecificElements() {
 	$('.user-specific-tab').hide()
 	$('.topBarDetails').hide()
+	$('.topBarDetails').parent().addClass('hide-empty') //hack to avoid empty floating div for modern layout
 }
 
 
@@ -443,6 +445,7 @@ var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 
 function updateTime(cycle, fraction, cycleDurationEstimation) {
+	$(".currentTime").attr("title", "Current Cycle: " + cycle)
 	currrentCycle = cycle
 	currentTime = (cycle + fraction) * totalmillisecPerWeek 
 	if (refreshIntervalTimer) {
